@@ -1,0 +1,213 @@
+/* ================================
+   Admin Header Styles
+   ================================ */
+
+.adm-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #0f172a;
+    padding: 12px 24px;
+    color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.adm-header-left {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.adm-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.adm-logo-icon {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    border: 2px solid #d4af37;
+}
+
+.adm-logo-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.adm-logo-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.3px;
+}
+
+.adm-logo-sub {
+    font-size: 10px;
+    color: #fbbf24;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Navigation */
+.adm-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 5px;
+    border-radius: 30px;
+}
+
+.adm-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: transparent;
+    color: #cbd5e1;
+    border-radius: 25px;
+    font-size: 13px;
+    font-weight: 700;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+}
+
+.adm-nav-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.adm-nav-item.active {
+    background: white;
+    color: #0f172a;
+}
+
+.adm-nav-badge {
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 800;
+    margin-left: 2px;
+}
+
+/* Right Side */
+.adm-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.adm-admin-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.adm-admin-avatar {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 14px;
+}
+
+.adm-admin-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.adm-admin-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+}
+
+.adm-admin-role {
+    font-size: 10px;
+    color: #fbbf24;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.adm-logout-btn {
+    padding: 10px 16px;
+    background: #dc2626;
+    color: white;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.adm-logout-btn:hover {
+    background: #b91c1c;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .adm-header {
+        padding: 10px 16px;
+    }
+    
+    .adm-nav-item {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .adm-admin-details {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .adm-header {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .adm-header-left {
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+    }
+    
+    .adm-nav {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .adm-header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+}

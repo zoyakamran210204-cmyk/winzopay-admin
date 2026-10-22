@@ -1,0 +1,386 @@
+/* ================================
+   Admin Transactions Page
+   ================================ */
+
+.adm-tx-page {
+    min-height: 100vh;
+    background: #f1f5f9;
+}
+
+.adm-tx-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px 24px;
+}
+
+.adm-tx-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 25px;
+}
+
+.adm-tx-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 4px;
+}
+
+.adm-tx-subtitle {
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* Tabs */
+.adm-tx-tabs {
+    display: flex;
+    gap: 6px;
+    background: white;
+    padding: 5px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+}
+
+.adm-tx-tab {
+    padding: 10px 18px;
+    background: transparent;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748b;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.adm-tx-tab:hover {
+    background: #f8fafc;
+}
+
+.adm-tx-tab.active {
+    background: #0f172a;
+    color: white;
+}
+
+.adm-tx-tab-count {
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 800;
+}
+
+.adm-tx-tab.active .adm-tx-tab-count {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.adm-tx-tab-count.gray {
+    background: #e2e8f0;
+    color: #64748b;
+}
+
+.adm-tx-tab.active .adm-tx-tab-count.gray {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+/* Transaction Card */
+.adm-tx-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.adm-tx-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s;
+}
+
+.adm-tx-card:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+}
+
+.adm-tx-card.pending {
+    border-left: 4px solid #f59e0b;
+}
+
+.adm-tx-card.approved {
+    border-left: 4px solid #16a34a;
+}
+
+.adm-tx-card.rejected {
+    border-left: 4px solid #dc2626;
+}
+
+/* Card Header */
+.adm-tx-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #f1f5f9;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.adm-tx-card-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.adm-tx-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.adm-tx-icon.deposit { background: #dbeafe; }
+.adm-tx-icon.withdraw { background: #fed7aa; }
+
+.adm-tx-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.adm-tx-info-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.adm-tx-info-sub {
+    font-size: 12px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.adm-tx-info-sub strong {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.adm-tx-card-right {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.adm-tx-amount {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+}
+
+/* Details Grid */
+.adm-tx-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    padding: 14px;
+    background: #f8fafc;
+    border-radius: 10px;
+    margin-bottom: 16px;
+}
+
+.adm-tx-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.adm-tx-detail-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.adm-tx-detail-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f172a;
+    word-break: break-word;
+}
+
+.adm-tx-detail-value.mono {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+}
+
+/* Bank Details Box */
+.adm-tx-bank-box {
+    padding: 14px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    margin-bottom: 16px;
+}
+
+.adm-tx-bank-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: #1e40af;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.adm-tx-bank-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.adm-tx-bank-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.adm-tx-bank-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #1e40af;
+    text-transform: uppercase;
+}
+
+.adm-tx-bank-value {
+    font-size: 13px;
+    font-weight: 800;
+    color: #0f172a;
+    font-family: 'Courier New', monospace;
+    word-break: break-word;
+}
+
+/* Action Buttons */
+.adm-tx-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.adm-tx-btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.adm-tx-btn.approve {
+    background: #16a34a;
+    color: white;
+}
+
+.adm-tx-btn.approve:hover:not(:disabled) {
+    background: #15803d;
+    transform: translateY(-1px);
+}
+
+.adm-tx-btn.reject {
+    background: #ea580c;
+    color: white;
+}
+
+.adm-tx-btn.reject:hover:not(:disabled) {
+    background: #c2410c;
+    transform: translateY(-1px);
+}
+
+.adm-tx-btn.delete {
+    background: #dc2626;
+    color: white;
+}
+
+.adm-tx-btn.delete:hover:not(:disabled) {
+    background: #b91c1c;
+    transform: translateY(-1px);
+}
+
+.adm-tx-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Empty State */
+.adm-tx-empty {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 16px;
+    border: 1px dashed #cbd5e1;
+}
+
+.adm-tx-empty-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.4;
+}
+
+.adm-tx-empty-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 6px;
+}
+
+.adm-tx-empty-text {
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* Loading */
+.adm-tx-loading {
+    text-align: center;
+    padding: 60px;
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .adm-tx-container { padding: 20px 15px; }
+    .adm-tx-card-header { flex-direction: column; align-items: flex-start; }
+    .adm-tx-card-right { align-items: flex-start; text-align: left; }
+    .adm-tx-actions { flex-direction: column; }
+    .adm-tx-btn { width: 100%; }
+}

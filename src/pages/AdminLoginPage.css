@@ -1,0 +1,145 @@
+/* Admin Login Page */
+.adm-login-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.adm-login-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+}
+
+.adm-login-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 30px;
+    justify-content: center;
+}
+
+.adm-login-logo-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 18px;
+    border: 2px solid #d4af37;
+}
+
+.adm-login-logo-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.adm-login-logo-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.adm-login-logo-sub {
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.adm-login-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.adm-login-sub {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.adm-login-group {
+    margin-bottom: 18px;
+}
+
+.adm-login-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 8px;
+}
+
+.adm-login-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    transition: all 0.2s;
+}
+
+.adm-login-input:focus {
+    border-color: #1e40af;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+.adm-login-btn {
+    width: 100%;
+    padding: 15px;
+    background: #0f172a;
+    color: white;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 800;
+    transition: all 0.2s;
+    margin-top: 10px;
+}
+
+.adm-login-btn:hover:not(:disabled) {
+    background: #1e293b;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.3);
+}
+
+.adm-login-btn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+.adm-login-error {
+    padding: 12px 16px;
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.adm-login-note {
+    font-size: 11px;
+    color: #94a3b8;
+    text-align: center;
+    margin-top: 20px;
+    line-height: 1.5;
+}
