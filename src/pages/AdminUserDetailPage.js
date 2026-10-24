@@ -19,6 +19,11 @@ const AdminUserDetailPage = () => {
     const [showNewPassword, setShowNewPassword] = useState(null);
     const [copied, setCopied] = useState(false);
 
+    // ⚠️ NAYA: Add Balance States
+    const [showAddBalance, setShowAddBalance] = useState(false);
+    const [balanceForm, setBalanceForm] = useState({ amount: '', balanceType: 'balance' });
+    const [balanceLoading, setBalanceLoading] = useState(false);
+
     // ================================
     // Load User + Data
     // ================================
@@ -102,9 +107,7 @@ const AdminUserDetailPage = () => {
     // Reset Password
     // ================================
     const resetPassword = async () => {
-        if (!window.confirm('⚠️ This will generate a NEW password. The old password will no longer work. Continue?')) {
-            return;
-        }
+        if (!window.confirm('⚠️ This will generate a NEW password. Continue?')) return;
 
         setActionLoading(true);
         setMessage({ type: '', text: '' });
@@ -124,11 +127,34 @@ const AdminUserDetailPage = () => {
         }
     };
 
-    // Copy password to clipboard
     const copyPassword = () => {
         navigator.clipboard.writeText(showNewPassword);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+    };
+
+    // ⚠️ NAYA: Handle Add Balance
+    const handleAddBalance = async (e) => {
+        e.preventDefault();
+        setBalanceLoading(true);
+        setMessage({ type: '', text: '' });
+
+        try {
+            const res = await api.put('/admin/user/add-balance', {
+                userId: user._id,
+                amount: Number(balanceForm.amount),
+                balanceType: balanceForm.balanceType
+            });
+
+            setUser({ ...user, ...res.data.user });
+            setMessage({ type: 'success', text: `✅ ${res.data.message}` });
+            setShowAddBalance(false);
+            setBalanceForm({ amount: '', balanceType: 'balance' });
+        } catch (err) {
+            setMessage({ type: 'error', text: err.response?.data?.message || 'Failed to add balance' });
+        } finally {
+            setBalanceLoading(false);
+        }
     };
 
     // Helpers
@@ -142,7 +168,6 @@ const AdminUserDetailPage = () => {
 
     const isSelf = () => admin?._id === user?._id || admin?.id === user?._id;
 
-    // Filters
     const deposits = transactions.filter(t => t.type === 'Deposit');
     const withdraws = transactions.filter(t => t.type === 'Withdraw');
     const planPurchases = transactions.filter(t => t.type === 'PlanPurchase');
@@ -201,8 +226,6 @@ const AdminUserDetailPage = () => {
             <AdminHeader />
 
             <div className="adm-ud-container">
-
-                {/* Breadcrumb */}
                 <div className="adm-ud-breadcrumb">
                     <button className="adm-ud-back-btn" onClick={() => navigate('/users')}>
                         ← Back to Users
@@ -211,101 +234,44 @@ const AdminUserDetailPage = () => {
                     <span>User Profile</span>
                 </div>
 
-                {/* Message */}
                 {message.text && (
                     <div className={`adm-ud-message ${message.type}`}>
                         {message.text}
                     </div>
                 )}
 
-                {/* New Password Modal */}
                 {showNewPassword && (
                     <div style={{
-                        padding: '20px',
-                        background: '#dcfce7',
-                        border: '2px solid #16a34a',
-                        borderRadius: '14px',
-                        marginBottom: '20px'
+                        padding: '20px', background: '#dcfce7', border: '2px solid #16a34a',
+                        borderRadius: '14px', marginBottom: '20px'
                     }}>
-                        <div style={{
-                            fontSize: '14px',
-                            fontWeight: 800,
-                            color: '#166534',
-                            marginBottom: '12px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px'
-                        }}>
+                        <div style={{ fontSize: '14px', fontWeight: 800, color: '#166534', marginBottom: '12px' }}>
                             🔑 New Password Generated (Show Once!)
                         </div>
-
                         <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '12px',
-                            background: 'white',
-                            padding: '14px 18px',
-                            borderRadius: '10px',
-                            border: '1px solid #86efac',
-                            marginBottom: '12px'
+                            display: 'flex', alignItems: 'center', gap: '12px',
+                            background: 'white', padding: '14px 18px', borderRadius: '10px',
+                            border: '1px solid #86efac', marginBottom: '12px'
                         }}>
-                            <span style={{
-                                flex: 1,
-                                fontFamily: 'monospace',
-                                fontSize: '20px',
-                                fontWeight: 800,
-                                color: '#166534',
-                                letterSpacing: '1.5px'
-                            }}>
+                            <span style={{ flex: 1, fontFamily: 'monospace', fontSize: '20px', fontWeight: 800, color: '#166534' }}>
                                 {showNewPassword}
                             </span>
-                            <button
-                                onClick={copyPassword}
-                                style={{
-                                    padding: '10px 18px',
-                                    background: copied ? '#0f172a' : '#16a34a',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontSize: '12px',
-                                    fontWeight: 700,
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s'
-                                }}
-                            >
+                            <button onClick={copyPassword} style={{
+                                padding: '10px 18px', background: copied ? '#0f172a' : '#16a34a',
+                                color: 'white', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: 700, cursor: 'pointer'
+                            }}>
                                 {copied ? '✅ Copied!' : '📋 Copy'}
                             </button>
                         </div>
-
-                        <div style={{
-                            fontSize: '11px',
-                            color: '#166534',
-                            fontWeight: 600,
-                            lineHeight: 1.5,
-                            marginBottom: '12px'
+                        <button onClick={() => setShowNewPassword(null)} style={{
+                            padding: '10px 20px', background: '#166534', color: 'white',
+                            border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: 700, cursor: 'pointer'
                         }}>
-                            ⚠️ Share this password with the user securely (WhatsApp/Phone). It will NOT be shown again. The old password is now invalid.
-                        </div>
-
-                        <button
-                            onClick={() => setShowNewPassword(null)}
-                            style={{
-                                padding: '10px 20px',
-                                background: '#166534',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontSize: '12px',
-                                fontWeight: 700,
-                                cursor: 'pointer'
-                            }}
-                        >
                             ✓ Done — Hide Password
                         </button>
                     </div>
                 )}
 
-                {/* Hero Card */}
                 <div className="adm-ud-hero">
                     <div className="adm-ud-hero-left">
                         <div className="adm-ud-hero-avatar">
@@ -316,12 +282,8 @@ const AdminUserDetailPage = () => {
                                 {user.name}
                                 {isSelf() && (
                                     <span style={{
-                                        marginLeft: 10,
-                                        fontSize: 10,
-                                        background: 'rgba(255,255,255,0.15)',
-                                        padding: '3px 10px',
-                                        borderRadius: 6,
-                                        fontWeight: 800
+                                        marginLeft: 10, fontSize: 10, background: 'rgba(255,255,255,0.15)',
+                                        padding: '3px 10px', borderRadius: 6, fontWeight: 800
                                     }}>
                                         YOU
                                     </span>
@@ -351,52 +313,40 @@ const AdminUserDetailPage = () => {
                     {!isSelf() && (
                         <div className="adm-ud-hero-actions">
                             {user.status !== 'Active' && (
-                                <button
-                                    className="adm-ud-hero-btn activate"
-                                    disabled={actionLoading}
-                                    onClick={() => changeStatus('Active')}
-                                >
+                                <button className="adm-ud-hero-btn activate" disabled={actionLoading} onClick={() => changeStatus('Active')}>
                                     ✅ Activate
                                 </button>
                             )}
                             {user.status === 'Active' && (
-                                <button
-                                    className="adm-ud-hero-btn freeze"
-                                    disabled={actionLoading}
-                                    onClick={() => changeStatus('Frozen')}
-                                >
+                                <button className="adm-ud-hero-btn freeze" disabled={actionLoading} onClick={() => changeStatus('Frozen')}>
                                     ❄️ Freeze
                                 </button>
                             )}
                             {user.status !== 'Deactivated' && (
-                                <button
-                                    className="adm-ud-hero-btn deactivate"
-                                    disabled={actionLoading}
-                                    onClick={() => changeStatus('Deactivated')}
-                                >
+                                <button className="adm-ud-hero-btn deactivate" disabled={actionLoading} onClick={() => changeStatus('Deactivated')}>
                                     🚫 Deactivate
                                 </button>
                             )}
-                            <button
-                                className="adm-ud-hero-btn admin"
-                                disabled={actionLoading}
-                                onClick={toggleAdmin}
-                            >
+                            <button className="adm-ud-hero-btn admin" disabled={actionLoading} onClick={toggleAdmin}>
                                 {user.role === 'Admin' ? '👤 Remove Admin' : '👑 Make Admin'}
                             </button>
+                            <button className="adm-ud-hero-btn" style={{ background: '#7c3aed', color: 'white' }} disabled={actionLoading} onClick={resetPassword}>
+                                🔑 Reset Password
+                            </button>
+                            
+                            {/* ⚠️ NAYA: Add Balance Button */}
                             <button
                                 className="adm-ud-hero-btn"
-                                style={{ background: '#7c3aed', color: 'white' }}
+                                style={{ background: '#16a34a', color: 'white' }}
                                 disabled={actionLoading}
-                                onClick={resetPassword}
+                                onClick={() => setShowAddBalance(true)}
                             >
-                                🔑 Reset Password
+                                💰 Add Balance
                             </button>
                         </div>
                     )}
                 </div>
 
-                {/* Stats Grid */}
                 <div className="adm-ud-stats">
                     <div className="adm-ud-stat blue">
                         <div className="adm-ud-stat-label">Top-Up Balance</div>
@@ -424,208 +374,143 @@ const AdminUserDetailPage = () => {
                     </div>
                 </div>
 
-                {/* Info Grid */}
                 <div className="adm-ud-grid">
-                    {/* Personal Info */}
                     <div className="adm-ud-card">
                         <div className="adm-ud-card-title">👤 Personal Information</div>
                         <div className="adm-ud-info-list">
-                            <div className="adm-ud-info-item">
-                                <span className="adm-ud-info-label">Full Name</span>
-                                <span className="adm-ud-info-value">{user.name}</span>
-                            </div>
-                            <div className="adm-ud-info-item">
-                                <span className="adm-ud-info-label">Email / Mobile</span>
-                                <span className="adm-ud-info-value mono">{user.email}</span>
-                            </div>
-                            <div className="adm-ud-info-item">
-                                <span className="adm-ud-info-label">Mobile</span>
-                                <span className="adm-ud-info-value mono">{user.mobile}</span>
-                            </div>
-                            <div className="adm-ud-info-item">
-                                <span className="adm-ud-info-label">Country</span>
-                                <span className="adm-ud-info-value">{user.country || 'Brazil'}</span>
-                            </div>
-                            <div className="adm-ud-info-item">
-                                <span className="adm-ud-info-label">Currency</span>
-                                <span className="adm-ud-info-value">{user.currency || 'BRL'}</span>
-                            </div>
-                            <div className="adm-ud-info-item">
-                                <span className="adm-ud-info-label">User ID</span>
-                                <span className="adm-ud-info-value mono">{user._id}</span>
-                            </div>
+                            <div className="adm-ud-info-item"><span className="adm-ud-info-label">Full Name</span><span className="adm-ud-info-value">{user.name}</span></div>
+                            <div className="adm-ud-info-item"><span className="adm-ud-info-label">Email / Mobile</span><span className="adm-ud-info-value mono">{user.email}</span></div>
+                            <div className="adm-ud-info-item"><span className="adm-ud-info-label">Mobile</span><span className="adm-ud-info-value mono">{user.mobile}</span></div>
+                            <div className="adm-ud-info-item"><span className="adm-ud-info-label">Country</span><span className="adm-ud-info-value">{user.country || 'Brazil'}</span></div>
+                            <div className="adm-ud-info-item"><span className="adm-ud-info-label">Currency</span><span className="adm-ud-info-value">{user.currency || 'BRL'}</span></div>
+                            <div className="adm-ud-info-item"><span className="adm-ud-info-label">User ID</span><span className="adm-ud-info-value mono">{user._id}</span></div>
                         </div>
                     </div>
 
-                    {/* Security / IP */}
                     <div className="adm-ud-card">
                         <div className="adm-ud-card-title">🛡️ Security & Tracking</div>
                         <div className="adm-ud-info-list">
-                            <div className="adm-ud-info-item">
-                                <span className="adm-ud-info-label">IP Address</span>
-                                <span className="adm-ud-info-value ip">
-                                    {user.ipAddress || 'N/A'}
-                                </span>
-                            </div>
-                            <div className="adm-ud-info-item">
-                                <span className="adm-ud-info-label">Status</span>
-                                <span className={`adm-ud-status ${user.status.toLowerCase()}`}>
-                                    {user.status}
-                                </span>
-                            </div>
-                            <div className="adm-ud-info-item">
-                                <span className="adm-ud-info-label">Role</span>
-                                <span className={`adm-ud-status ${user.role === 'Admin' ? 'active' : 'pending'}`}>
-                                    {user.role}
-                                </span>
-                            </div>
-                            <div className="adm-ud-info-item">
-                                <span className="adm-ud-info-label">Account Created</span>
-                                <span className="adm-ud-info-value">
-                                    {formatDate(user.createdAt)}
-                                </span>
-                            </div>
+                            <div className="adm-ud-info-item"><span className="adm-ud-info-label">IP Address</span><span className="adm-ud-info-value ip">{user.ipAddress || 'N/A'}</span></div>
+                            <div className="adm-ud-info-item"><span className="adm-ud-info-label">Status</span><span className={`adm-ud-status ${user.status.toLowerCase()}`}>{user.status}</span></div>
+                            <div className="adm-ud-info-item"><span className="adm-ud-info-label">Role</span><span className={`adm-ud-status ${user.role === 'Admin' ? 'active' : 'pending'}`}>{user.role}</span></div>
+                            <div className="adm-ud-info-item"><span className="adm-ud-info-label">Account Created</span><span className="adm-ud-info-value">{formatDate(user.createdAt)}</span></div>
                         </div>
                     </div>
                 </div>
 
-                {/* Activity Tabs */}
+                <div className="adm-ud-card" style={{ marginTop: '20px' }}>
+                    <div className="adm-ud-card-title">🏦 User Bank Accounts ({user.bankAccounts?.length || 0})</div>
+                    {(!user.bankAccounts || user.bankAccounts.length === 0) ? (
+                        <div className="adm-ud-empty" style={{ padding: '20px' }}>No bank accounts added by this user yet.</div>
+                    ) : (
+                        user.bankAccounts.map(acc => (
+                            <div key={acc._id} style={{ padding: '14px', background: '#f8fafc', borderRadius: '10px', marginBottom: '10px', border: '1px solid #e2e8f0' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                    <strong style={{ fontSize: '14px', color: '#0f172a' }}>{acc.bankName} ({acc.bankCode})</strong>
+                                    {acc.isDefault && <span style={{ background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: '6px', fontSize: '10px', fontWeight: 800 }}>DEFAULT</span>}
+                                </div>
+                                <div style={{ fontSize: '12px', color: '#475569', lineHeight: 1.6 }}>
+                                    <div>👤 Holder: <strong>{acc.accountHolderName}</strong></div>
+                                    <div>🔢 Account: <strong>{acc.accountNumber}</strong> | Agency: <strong>{acc.agency}</strong></div>
+                                    <div>🆔 CPF/CNPJ: <strong>{acc.cpfCnpj}</strong></div>
+                                    <div>📋 Type: <strong>{acc.accountType || 'N/A'}</strong></div>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+
                 <div className="adm-ud-tabs">
                     {tabs.map(tab => (
-                        <button
-                            key={tab.key}
-                            className={`adm-ud-tab ${activeTab === tab.key ? 'active' : ''}`}
-                            onClick={() => setActiveTab(tab.key)}
-                        >
-                            <span>{tab.icon}</span>
-                            {tab.label}
-                            <span className="adm-ud-tab-count">{tab.count}</span>
+                        <button key={tab.key} className={`adm-ud-tab ${activeTab === tab.key ? 'active' : ''}`} onClick={() => setActiveTab(tab.key)}>
+                            <span>{tab.icon}</span>{tab.label}<span className="adm-ud-tab-count">{tab.count}</span>
                         </button>
                     ))}
                 </div>
 
-                {/* Activity List */}
                 {currentList.length === 0 ? (
-                    <div className="adm-ud-empty">
-                        No {activeTab === 'all' || activeTab === 'transactions' ? 'activity' : activeTab} records found
-                    </div>
+                    <div className="adm-ud-empty">No {activeTab === 'all' || activeTab === 'transactions' ? 'activity' : activeTab} records found</div>
                 ) : (
                     <div className="adm-ud-list">
                         {currentList.map(tx => {
                             const info = getTxInfo(tx);
                             return (
                                 <div key={tx._id} className="adm-ud-list-item">
-                                    <div className={`adm-ud-list-icon ${info.cls}`}>
-                                        {info.icon}
-                                    </div>
+                                    <div className={`adm-ud-list-icon ${info.cls}`}>{info.icon}</div>
                                     <div className="adm-ud-list-content">
-                                        <div className="adm-ud-list-title">
-                                            {info.label}
-                                            {tx.planName && ` • Plan ${tx.planName}`}
-                                        </div>
+                                        <div className="adm-ud-list-title">{info.label}{tx.planName && ` • Plan ${tx.planName}`}</div>
                                         <div className="adm-ud-list-sub">
                                             <span>{formatDate(tx.createdAt)}</span>
                                             {tx.cryptoType && <span>• {tx.cryptoType}</span>}
-                                            <span className={`adm-ud-status ${tx.status.toLowerCase()}`}>
-                                                {tx.status}
-                                            </span>
+                                            <span className={`adm-ud-status ${tx.status.toLowerCase()}`}>{tx.status}</span>
                                         </div>
-
-                                        {/* Bank Details (for Withdraw) */}
                                         {tx.type === 'Withdraw' && tx.bankDetails?.bankCode && (
                                             <div className="adm-ud-bank-card">
                                                 <div className="adm-ud-bank-title">🏦 Bank Details</div>
                                                 <div className="adm-ud-bank-grid">
-                                                    <div className="adm-ud-bank-item">
-                                                        <span className="adm-ud-bank-label">Bank</span>
-                                                        <span className="adm-ud-bank-value">
-                                                            {tx.bankDetails.bankName}
-                                                        </span>
-                                                    </div>
-                                                    <div className="adm-ud-bank-item">
-                                                        <span className="adm-ud-bank-label">Holder</span>
-                                                        <span className="adm-ud-bank-value">
-                                                            {tx.bankDetails.accountHolderName}
-                                                        </span>
-                                                    </div>
-                                                    <div className="adm-ud-bank-item">
-                                                        <span className="adm-ud-bank-label">Account No.</span>
-                                                        <span className="adm-ud-bank-value">
-                                                            {tx.bankDetails.accountNumber}
-                                                        </span>
-                                                    </div>
-                                                    <div className="adm-ud-bank-item">
-                                                        <span className="adm-ud-bank-label">CPF</span>
-                                                        <span className="adm-ud-bank-value">
-                                                            {tx.bankDetails.cpfCnpj}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* PIX Details */}
-                                        {tx.type === 'Withdraw' && tx.pixDetails?.pixKey && (
-                                            <div className="adm-ud-bank-card" style={{ background: '#f0fdf4', borderColor: '#86efac' }}>
-                                                <div className="adm-ud-bank-title" style={{ color: '#166534' }}>
-                                                    📱 PIX Details
-                                                </div>
-                                                <div className="adm-ud-bank-grid">
-                                                    <div className="adm-ud-bank-item">
-                                                        <span className="adm-ud-bank-label" style={{ color: '#166534' }}>Key Type</span>
-                                                        <span className="adm-ud-bank-value">
-                                                            {tx.pixDetails.pixKeyType}
-                                                        </span>
-                                                    </div>
-                                                    <div className="adm-ud-bank-item">
-                                                        <span className="adm-ud-bank-label" style={{ color: '#166534' }}>PIX Key</span>
-                                                        <span className="adm-ud-bank-value">
-                                                            {tx.pixDetails.pixKey}
-                                                        </span>
-                                                    </div>
-                                                    <div className="adm-ud-bank-item">
-                                                        <span className="adm-ud-bank-label" style={{ color: '#166534' }}>Holder</span>
-                                                        <span className="adm-ud-bank-value">
-                                                            {tx.pixDetails.accountHolderName}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* USDT Details */}
-                                        {tx.type === 'Withdraw' && tx.cryptoDetails?.walletAddress && (
-                                            <div className="adm-ud-bank-card" style={{ background: '#fef3c7', borderColor: '#fcd34d' }}>
-                                                <div className="adm-ud-bank-title" style={{ color: '#92400e' }}>
-                                                    🪙 USDT Wallet
-                                                </div>
-                                                <div className="adm-ud-bank-grid">
-                                                    <div className="adm-ud-bank-item">
-                                                        <span className="adm-ud-bank-label" style={{ color: '#92400e' }}>Network</span>
-                                                        <span className="adm-ud-bank-value">
-                                                            {tx.cryptoDetails.network}
-                                                        </span>
-                                                    </div>
-                                                    <div className="adm-ud-bank-item">
-                                                        <span className="adm-ud-bank-label" style={{ color: '#92400e' }}>Wallet</span>
-                                                        <span className="adm-ud-bank-value">
-                                                            {tx.cryptoDetails.walletAddress}
-                                                        </span>
-                                                    </div>
+                                                    <div className="adm-ud-bank-item"><span className="adm-ud-bank-label">Bank</span><span className="adm-ud-bank-value">{tx.bankDetails.bankName}</span></div>
+                                                    <div className="adm-ud-bank-item"><span className="adm-ud-bank-label">Holder</span><span className="adm-ud-bank-value">{tx.bankDetails.accountHolderName}</span></div>
+                                                    <div className="adm-ud-bank-item"><span className="adm-ud-bank-label">Account No.</span><span className="adm-ud-bank-value">{tx.bankDetails.accountNumber}</span></div>
+                                                    <div className="adm-ud-bank-item"><span className="adm-ud-bank-label">CPF</span><span className="adm-ud-bank-value">{tx.bankDetails.cpfCnpj}</span></div>
                                                 </div>
                                             </div>
                                         )}
                                     </div>
-                                    <div className={`adm-ud-list-amount ${info.sign === '+' ? 'positive' : 'negative'}`}>
-                                        {info.sign} R$ {tx.amount.toLocaleString()}
-                                    </div>
+                                    <div className={`adm-ud-list-amount ${info.sign === '+' ? 'positive' : 'negative'}`}>{info.sign} R$ {tx.amount.toLocaleString()}</div>
                                 </div>
                             );
                         })}
                     </div>
                 )}
-
             </div>
+
+            {/* ⚠️ ADD BALANCE MODAL */}
+            {showAddBalance && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', zIndex: 9999, padding: '20px'
+                }} onClick={() => setShowAddBalance(false)}>
+                    <div style={{
+                        background: 'white', borderRadius: '16px', padding: '24px',
+                        width: '100%', maxWidth: '400px'
+                    }} onClick={(e) => e.stopPropagation()}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                            <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>💰 Add Balance</h3>
+                            <button onClick={() => setShowAddBalance(false)} style={{ background: 'transparent', fontSize: '20px', cursor: 'pointer' }}>✕</button>
+                        </div>
+                        <form onSubmit={handleAddBalance}>
+                            <div style={{ marginBottom: '12px' }}>
+                                <label style={{ fontSize: '11px', fontWeight: 800, color: '#64748b', display: 'block', marginBottom: '4px' }}>Balance Type</label>
+                                <select 
+                                    value={balanceForm.balanceType} 
+                                    onChange={(e) => setBalanceForm({ ...balanceForm, balanceType: e.target.value })}
+                                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
+                                >
+                                    <option value="balance">Top-Up Balance</option>
+                                    <option value="miningCapital">Mining Capital</option>
+                                    <option value="rpBalance">RP Balance</option>
+                                    <option value="withdrawableBalance">Withdrawable Balance</option>
+                                </select>
+                            </div>
+                            <div style={{ marginBottom: '20px' }}>
+                                <label style={{ fontSize: '11px', fontWeight: 800, color: '#64748b', display: 'block', marginBottom: '4px' }}>Amount (R$)</label>
+                                <input 
+                                    type="number" 
+                                    value={balanceForm.amount} 
+                                    onChange={(e) => setBalanceForm({ ...balanceForm, amount: e.target.value })} 
+                                    placeholder="e.g. 500" 
+                                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }} 
+                                    required 
+                                />
+                            </div>
+                            <button type="submit" disabled={balanceLoading} style={{ width: '100%', padding: '14px', background: '#16a34a', color: 'white', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: 800, cursor: 'pointer' }}>
+                                {balanceLoading ? '⏳ Adding...' : '✓ Add Balance'}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
