@@ -8,9 +8,7 @@ const AdminLoginPage = () => {
     const navigate = useNavigate();
     const { login } = useAdminAuth();
 
-    // Naya state: Login method (Email ya Mobile)
-    const [loginMethod, setLoginMethod] = useState('email'); 
-    
+    const [loginMethod, setLoginMethod] = useState('email'); // 'email' ya 'mobile'
     const [email, setEmail] = useState('');
     const [mobile, setMobile] = useState('');
     const [password, setPassword] = useState('');
@@ -23,14 +21,14 @@ const AdminLoginPage = () => {
         setLoading(true);
 
         try {
-            // Agar Email select hai to email bhejenge, warna mobile
+            // Payload banate hain (agar email select hai to email, warna mobile)
             const payload = loginMethod === 'email' 
-                ? { email: email, password } 
-                : { mobile: mobile, password };
+                ? { email, password } 
+                : { mobile, password };
 
             const res = await api.post('/auth/login', payload);
 
-            // Check if user is admin
+            // Role check
             if (res.data.user.role !== 'Admin') {
                 setError('Access denied. Admin only.');
                 setLoading(false);
@@ -50,7 +48,6 @@ const AdminLoginPage = () => {
     return (
         <div className="adm-login-page">
             <div className="adm-login-card">
-
                 <div className="adm-login-logo">
                     <div className="adm-login-logo-icon">WP</div>
                     <div className="adm-login-logo-text">
@@ -62,7 +59,7 @@ const AdminLoginPage = () => {
                 <h1 className="adm-login-title">Admin Login</h1>
                 <p className="adm-login-sub">Enter your admin credentials to continue</p>
 
-                {/* 👈 NAYA: Email / Mobile Toggle Switch */}
+                {/* 👈 Email / Mobile Toggle */}
                 <div style={{ display: 'flex', background: '#f1f5f9', padding: '5px', borderRadius: '10px', marginBottom: '20px' }}>
                     <button
                         type="button"
@@ -71,8 +68,7 @@ const AdminLoginPage = () => {
                             flex: 1, padding: '10px', borderRadius: '8px', border: 'none', fontWeight: 700, cursor: 'pointer',
                             background: loginMethod === 'email' ? 'white' : 'transparent',
                             boxShadow: loginMethod === 'email' ? '0 2px 5px rgba(0,0,0,0.1)' : 'none',
-                            color: loginMethod === 'email' ? '#0f172a' : '#64748b',
-                            transition: 'all 0.2s'
+                            color: loginMethod === 'email' ? '#0f172a' : '#64748b'
                         }}
                     >
                         📧 Email
@@ -84,8 +80,7 @@ const AdminLoginPage = () => {
                             flex: 1, padding: '10px', borderRadius: '8px', border: 'none', fontWeight: 700, cursor: 'pointer',
                             background: loginMethod === 'mobile' ? 'white' : 'transparent',
                             boxShadow: loginMethod === 'mobile' ? '0 2px 5px rgba(0,0,0,0.1)' : 'none',
-                            color: loginMethod === 'mobile' ? '#0f172a' : '#64748b',
-                            transition: 'all 0.2s'
+                            color: loginMethod === 'mobile' ? '#0f172a' : '#64748b'
                         }}
                     >
                         📱 Mobile
@@ -95,7 +90,6 @@ const AdminLoginPage = () => {
                 {error && <div className="adm-login-error">⚠️ {error}</div>}
 
                 <form onSubmit={handleLogin}>
-                    {/* Agar Email select hai to Email input dikhao */}
                     {loginMethod === 'email' ? (
                         <div className="adm-login-group">
                             <label className="adm-login-label">Email Address</label>
@@ -109,13 +103,12 @@ const AdminLoginPage = () => {
                             />
                         </div>
                     ) : (
-                        /* Agar Mobile select hai to Mobile input dikhao */
                         <div className="adm-login-group">
                             <label className="adm-login-label">Mobile Number</label>
                             <input
                                 type="tel"
                                 className="adm-login-input"
-                                placeholder="e.g. 9876543210"
+                                placeholder="e.g. 55555555"
                                 value={mobile}
                                 onChange={(e) => setMobile(e.target.value)}
                                 required
@@ -135,11 +128,7 @@ const AdminLoginPage = () => {
                         />
                     </div>
 
-                    <button
-                        type="submit"
-                        className="adm-login-btn"
-                        disabled={loading}
-                    >
+                    <button type="submit" className="adm-login-btn" disabled={loading}>
                         {loading ? '⏳ Signing in...' : '🔐 Sign In to Admin Panel'}
                     </button>
                 </form>
@@ -148,7 +137,6 @@ const AdminLoginPage = () => {
                     ⚠️ This is a secure admin area.<br />
                     Unauthorized access is prohibited.
                 </div>
-
             </div>
         </div>
     );
