@@ -18,6 +18,9 @@ const AdminPaymentSettingsPage = () => {
     const [cnpj, setCnpj] = useState('');
     const [evpKey, setEvpKey] = useState('');
     const [randomKey, setRandomKey] = useState('');
+    
+    // 👈 NAYA: Telegram Support State
+    const [telegramSupport, setTelegramSupport] = useState('vickypp');
 
     useEffect(() => {
         const load = async () => {
@@ -25,15 +28,18 @@ const AdminPaymentSettingsPage = () => {
                 const res = await api.get('/payment');
                 const s = res.data;
                 setSettings(s);
-                setBtc(s.wallets.BTC);
-                setBtcr(s.wallets['BTC(r)']);
-                setUsdt(s.wallets.USDT);
-                setEth(s.wallets.ETH);
-                setCompanyName(s.bank.companyName);
-                setBankName(s.bank.bankName);
-                setCnpj(s.bank.cnpj);
-                setEvpKey(s.bank.evpKey);
-                setRandomKey(s.bank.randomKey);
+                setBtc(s.wallets?.BTC || '');
+                setBtcr(s.wallets?.['BTC(r)'] || '');
+                setUsdt(s.wallets?.USDT || '');
+                setEth(s.wallets?.ETH || '');
+                setCompanyName(s.bank?.companyName || '');
+                setBankName(s.bank?.bankName || '');
+                setCnpj(s.bank?.cnpj || '');
+                setEvpKey(s.bank?.evpKey || '');
+                setRandomKey(s.bank?.randomKey || '');
+                
+                // 👈 NAYA: Load Telegram Support
+                setTelegramSupport(s.telegramSupport || 'vickypp');
             } catch (err) {
                 setMessage({ type: 'error', text: 'Failed to load settings' });
             } finally {
@@ -61,10 +67,12 @@ const AdminPaymentSettingsPage = () => {
                     cnpj,
                     evpKey,
                     randomKey
-                }
+                },
+                // 👈 NAYA: Send Telegram Support
+                telegramSupport
             });
             setSettings(res.data.settings);
-            setMessage({ type: 'success', text: '✅ Payment settings updated! Users will see new details immediately.' });
+            setMessage({ type: 'success', text: '✅ Settings updated! Users will see new details immediately.' });
         } catch (err) {
             setMessage({ type: 'error', text: err.response?.data?.message || 'Failed to save' });
         } finally {
@@ -121,10 +129,10 @@ const AdminPaymentSettingsPage = () => {
 
                 <div style={{ marginBottom: 25 }}>
                     <h1 style={{ fontSize: 26, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
-                        💰 Payment Settings
+                        💰 Payment & Support Settings
                     </h1>
                     <p style={{ fontSize: 13, color: '#64748b' }}>
-                        Update crypto wallets and bank details here — changes appear instantly for all users
+                        Update crypto wallets, bank details, and Telegram support username here
                     </p>
                 </div>
 
@@ -141,6 +149,25 @@ const AdminPaymentSettingsPage = () => {
                         {message.text}
                     </div>
                 )}
+
+                {/* 👈 NAYA: Telegram Support Settings */}
+                <div style={cardStyle}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: '#0f172a', marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #f1f5f9' }}>
+                        💬 Telegram Support
+                    </div>
+                    <div>
+                        <label style={labelStyle}>Telegram Username (without @)</label>
+                        <input 
+                            style={{...inputStyle, fontFamily: 'inherit'}} 
+                            value={telegramSupport} 
+                            onChange={(e) => setTelegramSupport(e.target.value)} 
+                            placeholder="e.g. vickypp" 
+                        />
+                        <p style={{ fontSize: 11, color: '#64748b', marginTop: 6 }}>
+                            Users will see "Contact us on Telegram" button with this username on every page.
+                        </p>
+                    </div>
+                </div>
 
                 {/* Crypto Wallets */}
                 <div style={cardStyle}>
