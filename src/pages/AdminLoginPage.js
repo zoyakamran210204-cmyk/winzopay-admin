@@ -28,11 +28,11 @@ const AdminLoginPage = () => {
 
             const res = await api.post('/auth/login', payload);
 
-            // Role check
-            if (res.data.user.role !== 'Admin') {
+            // 🔥 Role check: Admin AUR SuperAdmin dono allow hain
+            if (res.data.user.role !== 'Admin' && res.data.user.role !== 'SuperAdmin') {
                 localStorage.removeItem('winzopay_admin_token');
                 localStorage.removeItem('winzopay_admin_user');
-                setError('Access denied. Admin only.');
+                setError('Access denied. Admin or SuperAdmin only.');
                 setLoading(false);
                 return;
             }
