@@ -64,7 +64,7 @@ const AdminUsersPage = () => {
     }, [users, searchTerm, statusFilter]);
 
     // ================================
-    // Change Status (Freeze / Activate / Deactivate)
+    // Change Status
     // ================================
     const changeStatus = async (userId, newStatus) => {
         const confirmMsg = `Are you sure you want to set this user to ${newStatus}?`;
@@ -89,6 +89,12 @@ const AdminUsersPage = () => {
     // Make / Remove Admin
     // ================================
     const toggleAdmin = async (userId, currentRole) => {
+        // 🔥 SuperAdmin ko koi change nahi kar sakta
+        if (currentRole === 'SuperAdmin') {
+            setMessage({ type: 'error', text: 'Cannot change role of a Super Admin.' });
+            return;
+        }
+
         const action = currentRole === 'Admin' ? 'remove-admin' : 'make-admin';
         const confirmMsg = currentRole === 'Admin'
             ? 'Remove admin privileges from this user?'
@@ -122,7 +128,7 @@ const AdminUsersPage = () => {
     const totalUsers = users.length;
     const activeUsers = users.filter(u => u.status === 'Active').length;
     const frozenUsers = users.filter(u => u.status === 'Frozen').length;
-    const adminCount = users.filter(u => u.role === 'Admin').length;
+    const adminCount = users.filter(u => u.role === 'Admin' || u.role === 'SuperAdmin').length;
 
     // ================================
     // Helpers
@@ -241,6 +247,7 @@ const AdminUsersPage = () => {
                         {filtered.map(user => {
                             const isUserSelf = isSelf(user._id);
                             const isBusy = actionLoading === user._id;
+                            const isSuperAdmin = user.role === 'SuperAdmin';
 
                             return (
                                 <div key={user._id} className="adm-user-row">
@@ -273,6 +280,19 @@ const AdminUsersPage = () => {
                                                         fontWeight: 800
                                                     }}>
                                                         YOU
+                                                    </span>
+                                                )}
+                                                {isSuperAdmin && (
+                                                    <span style={{
+                                                        marginLeft: 6,
+                                                        fontSize: 9,
+                                                        color: '#92400e',
+                                                        background: '#fef3c7',
+                                                        padding: '2px 6px',
+                                                        borderRadius: 4,
+                                                        fontWeight: 800
+                                                    }}>
+                                                        SUPER ADMIN
                                                     </span>
                                                 )}
                                             </div>
@@ -308,7 +328,7 @@ const AdminUsersPage = () => {
 
                                     {/* Role */}
                                     <div>
-                                        <span className={`adm-badge ${user.role.toLowerCase()}`}>
+                                        <span className={`adm-badge ${isSuperAdmin ? 'admin' : user.role.toLowerCase()}`}>
                                             {user.role}
                                         </span>
                                     </div>
@@ -325,7 +345,7 @@ const AdminUsersPage = () => {
                                         </button>
 
                                         {/* Activate Button */}
-                                        {user.status !== 'Active' && (
+                                        {user.status !== 'Active' && !isSuperAdmin && (
                                             <button
                                                 className="adm-action-btn activate"
                                                 disabled={isBusy}
@@ -336,7 +356,7 @@ const AdminUsersPage = () => {
                                         )}
 
                                         {/* Freeze Button */}
-                                        {user.status === 'Active' && !isUserSelf && (
+                                        {user.status === 'Active' && !isUserSelf && !isSuperAdmin && (
                                             <button
                                                 className="adm-action-btn freeze"
                                                 disabled={isBusy}
@@ -347,7 +367,7 @@ const AdminUsersPage = () => {
                                         )}
 
                                         {/* Deactivate Button */}
-                                        {user.status !== 'Deactivated' && !isUserSelf && (
+                                        {user.status !== 'Deactivated' && !isUserSelf && !isSuperAdmin && (
                                             <button
                                                 className="adm-action-btn deactivate"
                                                 disabled={isBusy}
@@ -358,7 +378,7 @@ const AdminUsersPage = () => {
                                         )}
 
                                         {/* Make/Remove Admin */}
-                                        {!isUserSelf && (
+                                        {!isUserSelf && !isSuperAdmin && (
                                             <button
                                                 className="adm-action-btn admin"
                                                 disabled={isBusy}
