@@ -8,7 +8,7 @@ const AdminLoginPage = () => {
     const navigate = useNavigate();
     const { login } = useAdminAuth();
 
-    const [loginMethod, setLoginMethod] = useState('email'); // 'email' ya 'mobile'
+    const [loginMethod, setLoginMethod] = useState('email');
     const [email, setEmail] = useState('');
     const [mobile, setMobile] = useState('');
     const [password, setPassword] = useState('');
@@ -21,18 +21,17 @@ const AdminLoginPage = () => {
         setLoading(true);
 
         try {
-            // Payload banate hain (agar email select hai to email, warna mobile)
             const payload = loginMethod === 'email' 
                 ? { email, password } 
                 : { mobile, password };
 
             const res = await api.post('/auth/login', payload);
 
-            // 🔥 Role check: Admin AUR SuperAdmin dono allow hain
-            if (res.data.user.role !== 'Admin' && res.data.user.role !== 'SuperAdmin') {
+            // Sirf Admin allow hai
+            if (res.data.user.role !== 'Admin') {
                 localStorage.removeItem('winzopay_admin_token');
                 localStorage.removeItem('winzopay_admin_user');
-                setError('Access denied. Admin or SuperAdmin only.');
+                setError('Access denied. Admin only.');
                 setLoading(false);
                 return;
             }
@@ -61,7 +60,6 @@ const AdminLoginPage = () => {
                 <h1 className="adm-login-title">Admin Login</h1>
                 <p className="adm-login-sub">Enter your admin credentials to continue</p>
 
-                {/* 👈 Email / Mobile Toggle */}
                 <div style={{ display: 'flex', background: '#f1f5f9', padding: '5px', borderRadius: '10px', marginBottom: '20px' }}>
                     <button
                         type="button"
