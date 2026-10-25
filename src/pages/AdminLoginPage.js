@@ -8,7 +8,11 @@ const AdminLoginPage = () => {
     const navigate = useNavigate();
     const { login } = useAdminAuth();
 
+    // Naya state: Login method (Email ya Mobile)
+    const [loginMethod, setLoginMethod] = useState('email'); 
+    
     const [email, setEmail] = useState('');
+    const [mobile, setMobile] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -19,7 +23,12 @@ const AdminLoginPage = () => {
         setLoading(true);
 
         try {
-            const res = await api.post('/auth/login', { email, password });
+            // Agar Email select hai to email bhejenge, warna mobile
+            const payload = loginMethod === 'email' 
+                ? { email: email, password } 
+                : { mobile: mobile, password };
+
+            const res = await api.post('/auth/login', payload);
 
             // Check if user is admin
             if (res.data.user.role !== 'Admin') {
@@ -53,20 +62,66 @@ const AdminLoginPage = () => {
                 <h1 className="adm-login-title">Admin Login</h1>
                 <p className="adm-login-sub">Enter your admin credentials to continue</p>
 
+                {/* 👈 NAYA: Email / Mobile Toggle Switch */}
+                <div style={{ display: 'flex', background: '#f1f5f9', padding: '5px', borderRadius: '10px', marginBottom: '20px' }}>
+                    <button
+                        type="button"
+                        onClick={() => { setLoginMethod('email'); setError(''); }}
+                        style={{
+                            flex: 1, padding: '10px', borderRadius: '8px', border: 'none', fontWeight: 700, cursor: 'pointer',
+                            background: loginMethod === 'email' ? 'white' : 'transparent',
+                            boxShadow: loginMethod === 'email' ? '0 2px 5px rgba(0,0,0,0.1)' : 'none',
+                            color: loginMethod === 'email' ? '#0f172a' : '#64748b',
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        📧 Email
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => { setLoginMethod('mobile'); setError(''); }}
+                        style={{
+                            flex: 1, padding: '10px', borderRadius: '8px', border: 'none', fontWeight: 700, cursor: 'pointer',
+                            background: loginMethod === 'mobile' ? 'white' : 'transparent',
+                            boxShadow: loginMethod === 'mobile' ? '0 2px 5px rgba(0,0,0,0.1)' : 'none',
+                            color: loginMethod === 'mobile' ? '#0f172a' : '#64748b',
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        📱 Mobile
+                    </button>
+                </div>
+
                 {error && <div className="adm-login-error">⚠️ {error}</div>}
 
                 <form onSubmit={handleLogin}>
-                    <div className="adm-login-group">
-                        <label className="adm-login-label">Email Address</label>
-                        <input
-                            type="email"
-                            className="adm-login-input"
-                            placeholder="admin@winzopay.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </div>
+                    {/* Agar Email select hai to Email input dikhao */}
+                    {loginMethod === 'email' ? (
+                        <div className="adm-login-group">
+                            <label className="adm-login-label">Email Address</label>
+                            <input
+                                type="email"
+                                className="adm-login-input"
+                                placeholder="admin@winzopay.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                            />
+                        </div>
+                    ) : (
+                        /* Agar Mobile select hai to Mobile input dikhao */
+                        <div className="adm-login-group">
+                            <label className="adm-login-label">Mobile Number</label>
+                            <input
+                                type="tel"
+                                className="adm-login-input"
+                                placeholder="e.g. 9876543210"
+                                value={mobile}
+                                onChange={(e) => setMobile(e.target.value)}
+                                required
+                            />
+                        </div>
+                    )}
 
                     <div className="adm-login-group">
                         <label className="adm-login-label">Password</label>
