@@ -30,6 +30,8 @@ const AdminLoginPage = () => {
 
             // Role check
             if (res.data.user.role !== 'Admin') {
+                localStorage.removeItem('winzopay_admin_token');
+                localStorage.removeItem('winzopay_admin_user');
                 setError('Access denied. Admin only.');
                 setLoading(false);
                 return;

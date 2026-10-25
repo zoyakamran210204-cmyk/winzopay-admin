@@ -1,10 +1,8 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import api from '../utils/api';
 
-// ================================
-// User Panel URL (env variable se)
-// ================================
-const USER_PANEL_URL = process.env.REACT_APP_USER_PANEL_URL || 'http://localhost:3000';
+// User Panel URL
+const USER_PANEL_URL = process.env.REACT_APP_USER_PANEL_URL || 'https://winzopay-frontend.vercel.app';
 
 const AdminAuthContext = createContext();
 
@@ -43,10 +41,7 @@ export const AdminAuthProvider = ({ children }) => {
         localStorage.removeItem('winzopay_admin_user');
     };
 
-    // ================================
-    // 🔥 refreshUser — polls /auth/me
-    // If admin was demoted → force logout immediately
-    // ================================
+    // 🔥 Polling function
     const refreshUser = useCallback(async () => {
         const storedToken = localStorage.getItem('winzopay_admin_token');
         if (!storedToken) return;
@@ -57,46 +52,39 @@ export const AdminAuthProvider = ({ children }) => {
             });
             const freshUser = res.data.user;
 
-            // 🔥 No longer Admin → kick out & send to User Panel
+            // Instant redirect if demoted to User
             if (freshUser.role !== 'Admin') {
                 logout();
-                // Full URL (works on Vercel)
-                window.location.href = `${USER_PANEL_URL}/login`;
+                window.location.href = `${USER_PANEL_URL}/`; 
                 return;
             }
 
-            // 🔥 Frozen / Deactivated → kick out
             if (freshUser.status === 'Frozen' || freshUser.status === 'Deactivated') {
                 logout();
-                window.location.href = '/login';
+                window.location.href = '/';
                 return;
             }
 
-            // Sync fresh admin data
             setAdmin(freshUser);
             localStorage.setItem('winzopay_admin_user', JSON.stringify(freshUser));
-
         } catch (err) {
             if (err.response?.status === 401 || err.response?.status === 403) {
                 logout();
-                window.location.href = '/login';
+                window.location.href = '/';
             }
         }
     }, []);
 
-    // Poll /auth/me every 20 seconds
+    // 🔥 Polling har 3 second mein
     useEffect(() => {
         if (!token) return;
-
         refreshUser();
-        const interval = setInterval(refreshUser, 20000);
+        const interval = setInterval(refreshUser, 3000); 
         return () => clearInterval(interval);
     }, [token, refreshUser]);
 
     return (
-        <AdminAuthContext.Provider
-            value={{ admin, token, loading, login, logout, refreshUser }}
-        >
+        <AdminAuthContext.Provider value={{ admin, token, loading, login, logout, refreshUser }}>
             {children}
         </AdminAuthContext.Provider>
     );
