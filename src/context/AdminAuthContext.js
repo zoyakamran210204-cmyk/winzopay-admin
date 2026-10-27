@@ -34,11 +34,13 @@ export const AdminAuthProvider = ({ children }) => {
         localStorage.setItem('winzopay_admin_user', JSON.stringify(adminData));
     };
 
+    // 🔥 FIXED LOGOUT
     const logout = () => {
         setAdmin(null);
         setToken(null);
         localStorage.removeItem('winzopay_admin_token');
         localStorage.removeItem('winzopay_admin_user');
+        window.location.href = '/'; // Force redirect to login page
     };
 
     // 🔥 Polling function
